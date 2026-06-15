@@ -8,7 +8,18 @@ This bot supports real-time switching, so one message in a conversation can use 
 
 This bot uses Seyfert as a wrapper around the discord API, Ollama as a wrapper around the local ai models.
 
-If you wish to use this in production... good luck, I've only experimented with locally installed models and currently there is no system written for this to work on a remote server.
+If you wish to use this in production... good luck. I've only experimented with locally installed models and currently there is no system written for this to work on a remote server.
+
+
+## Use (locally)
+
+```bash
+pnpm install
+
+pnpm exec chroma run --path <your-path>
+
+pnpm dev
+``` 
 
 ## Ideas (AI generated ones)
 
