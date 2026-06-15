@@ -1,5 +1,30 @@
+import fs from "fs/promises";
+import path from "path";
 import type { CollectionStore } from "src/services/db/types";
 import type { Message } from "src/ai/ollama";
+
+export interface ThreadConfig {
+  model?: string;
+  thinking?: boolean;
+}
+
+const THREAD_CONFIG_PATH = path.join(process.cwd(), "data", "thread-configs.json");
+
+async function loadThreadConfigs(): Promise<Record<string, ThreadConfig>> {
+  try {
+    const data = await fs.readFile(THREAD_CONFIG_PATH, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
+
+async function saveThreadConfigs(
+  configs: Record<string, ThreadConfig>,
+): Promise<void> {
+  await fs.mkdir(path.dirname(THREAD_CONFIG_PATH), { recursive: true });
+  await fs.writeFile(THREAD_CONFIG_PATH, JSON.stringify(configs, null, 2));
+}
 
 let idCounter = 0;
 
@@ -112,6 +137,26 @@ export class ConversationStore {
   async exists(threadId: string): Promise<boolean> {
     const coll = await this.getStore().getCollection(collectionName(threadId));
     return coll !== null;
+  }
+
+  /** Get per-thread config overrides (model, thinking). */
+  async getConfig(threadId: string): Promise<ThreadConfig> {
+    const configs = await loadThreadConfigs();
+    return configs[threadId] ?? {};
+  }
+
+  /** Set per-thread config overrides. Merges with existing values. */
+  async setConfig(threadId: string, cfg: ThreadConfig): Promise<void> {
+    const configs = await loadThreadConfigs();
+    configs[threadId] = { ...configs[threadId], ...cfg };
+    await saveThreadConfigs(configs);
+  }
+
+  /** Remove all per-thread config overrides for a thread. */
+  async deleteConfig(threadId: string): Promise<void> {
+    const configs = await loadThreadConfigs();
+    delete configs[threadId];
+    await saveThreadConfigs(configs);
   }
 }
 

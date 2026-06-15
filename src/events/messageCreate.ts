@@ -53,6 +53,7 @@ export default createEvent({
           channel: thread,
           messages: await conversation.get(thread.id),
           model: config.model,
+          thinking: config.thinking,
           systemPrompt: SYSTEM_PROMPT,
           components: row,
         });
@@ -63,11 +64,13 @@ export default createEvent({
       await conversation.add(channel.id, "user", message.content, message.id);
 
       const messages = await conversation.get(channel.id, MAX_MESSAGES);
+      const threadCfg = await conversation.getConfig(channel.id);
 
       const result = await aiRespond({
         channel,
         messages,
-        model: config.model,
+        model: threadCfg.model ?? config.model,
+        thinking: threadCfg.thinking,
         systemPrompt: SYSTEM_PROMPT,
         components: row,
       });

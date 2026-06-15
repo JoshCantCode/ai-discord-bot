@@ -10,6 +10,7 @@ import {
 import { listModels } from "src/ai/ollama";
 import { config, edit } from "src/config/config";
 import { getModelInfo, formatCapabilities, formatCapBadges } from "src/config/models";
+import { conversation } from "src/services";
 
 const SELECT_CUSTOM_ID = "model-select";
 
@@ -46,6 +47,11 @@ function buildSelectMenu(models: string[], currentModel: string) {
 })
 export default class ModelCommand extends Command {
   async run(ctx: CommandContext) {
+    const channel = await ctx.channel();
+    const isThread = channel.isThread();
+    const threadCfg = isThread ? await conversation.getConfig(channel.id) : {};
+    const currentModel = threadCfg.model ?? config.model;
+
     const models = await listModels();
 
     if (models.length === 0) {
@@ -57,12 +63,12 @@ export default class ModelCommand extends Command {
     }
 
     const row = new ActionRow<StringSelectMenu>().addComponents(
-      buildSelectMenu(models, config.model),
+      buildSelectMenu(models, currentModel),
     );
 
     const message = await ctx.write(
       {
-        embeds: [buildEmbed(config.model)],
+        embeds: [buildEmbed(currentModel)],
         components: [row],
       },
       true,
@@ -76,8 +82,15 @@ export default class ModelCommand extends Command {
       const selected = interaction.values[0];
       const info = getModelInfo(selected);
 
-      edit("model", selected);
-      edit("thinking", info.capabilities.includes("thinking"));
+      if (isThread) {
+        await conversation.setConfig(channel.id, {
+          model: selected,
+          thinking: info.capabilities.includes("thinking"),
+        });
+      } else {
+        edit("model", selected);
+        edit("thinking", info.capabilities.includes("thinking"));
+      }
 
       await interaction.update({
         embeds: [buildEmbed(selected)],

@@ -1,0 +1,10 @@
+{
+  "1516120604179300434": {
+    "model": "qwen3:4b",
+    "thinking": true
+  },
+  "1516190801091231815": {
+    "model": "gemma4:e4b",
+    "thinking": false
+  }
+}

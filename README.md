@@ -37,7 +37,7 @@ pnpm dev
 
 ### Expanded AI capabilities
 - **Vision support** — handle image attachments for models that support vision (llava, minicpm-v, etc.) (note: debatable as I dislike generative AI and think its the worst thing ever created)
-- **Tool / function calling** — let the bot run commands, search the web, look up docs, etc. via model tool calling
+- [x] **Tool / function calling** — let the bot run commands, search the web, look up docs, etc. via model tool calling
 
 ### Per-thread configuration
 - **Per-channel / per-user model overrides** — let users pick a model for their thread without changing the global default

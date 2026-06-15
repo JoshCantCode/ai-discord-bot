@@ -36,8 +36,10 @@ export default class SummaryCommand extends Command {
     await context.deferReply();
 
     try {
-      const result = await summarize(messages);
-      const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${config.model}`;
+      const threadCfg = await conversation.getConfig(channel.id);
+      const model = threadCfg.model ?? config.model;
+      const result = await summarize(messages, model);
+      const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${model}`;
       await context.editResponse({
         embeds: [responseEmbed(result.content, "Conversation Summary", footer)],
       });

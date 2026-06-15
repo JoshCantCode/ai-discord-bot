@@ -20,6 +20,8 @@ export default class NewAnswerButtonCommand extends ComponentCommand {
 
   async run(context: ComponentContext<typeof this.componentType>) {
     const channel = await context.channel();
+    const threadCfg = await conversation.getConfig(channel.id);
+    const model = threadCfg.model ?? config.model;
 
     const messages = await conversation.get(channel.id, 40);
     if (
@@ -52,14 +54,20 @@ export default class NewAnswerButtonCommand extends ComponentCommand {
     const systemPrompt = process.env.SYSTEM_PROMPT ?? "";
 
     try {
-      const result = await chat(messages, config.model, systemPrompt);
+      const result = await chat(
+        messages,
+        model,
+        systemPrompt,
+        false,
+        threadCfg.thinking,
+      );
       context.client.logger.debug(
         "Redo",
         `len=${result.content.length}`,
         result.content,
       );
 
-      const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${config.model}`;
+      const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${model}`;
 
       const embed = responseEmbed(result.content, undefined, footer);
       await context.editResponse({
