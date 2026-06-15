@@ -1,4 +1,5 @@
 import { config } from "seyfert";
+import { GatewayIntentBits } from "seyfert/lib/types";
 
 export default config.bot({
   token: process.env.BOT_TOKEN ?? "",
@@ -8,6 +9,6 @@ export default config.bot({
     events: "events",
     components: "components",
   },
-  intents: ["Guilds", "GuildMessages", "MessageContent"],
+  intents: Object.keys(GatewayIntentBits).filter((k) => isNaN(Number(k))),
   port: 4444,
 });

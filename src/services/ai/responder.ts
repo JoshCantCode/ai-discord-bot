@@ -53,12 +53,14 @@ export async function aiRespond(
   try {
     const result = respond
       ? await respond(messages)
-      : await chat(messages, model, systemPrompt);
+      : await chat(messages, model, systemPrompt, true);
 
     const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${config.model}`;
 
     const embed = responseEmbed(result.content, embedTitle, footer);
-    const editOpts: { embeds: Embed[]; components?: ActionRow<any>[] } = { embeds: [embed] };
+    const editOpts: { embeds: Embed[]; components?: ActionRow<any>[] } = {
+      embeds: [embed],
+    };
     if (components) editOpts.components = [components];
     await botMsg.edit(editOpts).catch(() => console.error("edit failed"));
 

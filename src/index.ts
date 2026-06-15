@@ -3,6 +3,7 @@ import { Client } from "seyfert";
 import type { ParseClient } from "seyfert";
 import { DatabaseService, ChromaStore, conversation } from "src/services";
 import type { CollectionStore } from "src/services/db/types";
+import { setClient } from "./ai/tools/context";
 
 const client = new Client() as Client<true> & {
   db: CollectionStore;
@@ -10,7 +11,7 @@ const client = new Client() as Client<true> & {
     db: DatabaseService;
   };
 };
-
+setClient(client);
 const dbService = new DatabaseService();
 const chroma = dbService.register(new ChromaStore());
 
