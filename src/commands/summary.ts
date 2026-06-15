@@ -15,12 +15,12 @@ export default class SummaryCommand extends Command {
     const channel = await context.channel();
     if (!channel.isThread())
       return context.write({
-        content: "You can only use this in a thread channel!",
+        embeds: [errorEmbed("You can only use this in a thread channel!")],
       });
 
     if (!conversation.exists(channel.id)) {
       return context.write({
-        content: "No conversation exists in this thread!",
+        embeds: [errorEmbed("No conversation exists in this thread!")],
       });
     }
 
