@@ -26,6 +26,7 @@ export interface AiRespondOptions {
   messages: Message[];
   respond?: (messages: Message[]) => Promise<ChatResult>;
   model?: string;
+  thinking?: boolean;
   systemPrompt?: string;
   embedTitle?: string;
   components?: ActionRow<any>;
@@ -41,6 +42,7 @@ export async function aiRespond(
     messages,
     respond,
     model = config.model,
+    thinking: thinkOverride,
     systemPrompt,
     embedTitle,
     components,
@@ -53,9 +55,9 @@ export async function aiRespond(
   try {
     const result = respond
       ? await respond(messages)
-      : await chat(messages, model, systemPrompt, true);
+      : await chat(messages, model, systemPrompt, true, thinkOverride);
 
-    const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${config.model}`;
+    const footer = `⚡ ${result.totalTokens} tokens in ${(result.durationMs / 1000).toFixed(1)}s | ${model}`;
 
     const embed = responseEmbed(result.content, embedTitle, footer);
     const editOpts: { embeds: Embed[]; components?: ActionRow<any>[] } = {

@@ -10,10 +10,9 @@ export type { Message };
 
 const hostEnv = process.env.OLLAMA_HOST ?? "http://localhost:11434";
 const url = new URL(hostEnv);
+
 const ollama = new Ollama({
   host: url.hostname,
-  port: Number(url.port) || 11434,
-  ssl: url.protocol === "https:",
 });
 
 /** Extract <think>...</think> blocks from model output. */
@@ -49,8 +48,9 @@ async function chatWithFallback(
   messages: Message[],
   model: string,
   tools?: Tool[],
+  thinkOverride?: boolean,
 ): Promise<ChatResult> {
-  let think = config.thinking;
+  let think = thinkOverride ?? config.thinking;
   const start = performance.now();
 
   const callOnce = async (msgs: Message[], thinkFlag: boolean) => {
@@ -122,7 +122,10 @@ async function chatWithFallback(
 }
 
 /** Send conversation to model with a summarization prompt. */
-export async function summarize(messages: Message[]): Promise<ChatResult> {
+export async function summarize(
+  messages: Message[],
+  model?: string,
+): Promise<ChatResult> {
   const prompt =
     "Extract the key factual points from this conversation. Ignore greetings, pleasantries, and observations about the conversation itself. 1-3 sentences max.";
   const conversationText = messages
@@ -132,7 +135,21 @@ export async function summarize(messages: Message[]): Promise<ChatResult> {
     { role: "system", content: prompt },
     { role: "user", content: conversationText },
   ];
-  return chatWithFallback(fullMessages, config.model);
+  return chatWithFallback(fullMessages, model ?? config.model);
+}
+
+export async function search(query: string) {
+  return await ollama.webSearch({
+    query: query,
+  });
+}
+
+export async function fetch(url: string) {
+  const result = await ollama.webFetch({
+    url,
+  });
+
+  return JSON.stringify(result);
 }
 
 /** Send messages to Ollama with optional system prompt. */
@@ -141,6 +158,7 @@ export async function chat(
   model: string,
   systemPrompt?: string,
   useTools = false,
+  thinkOverride?: boolean,
 ): Promise<ChatResult> {
   const fullMessages: Message[] = systemPrompt
     ? [{ role: "system", content: systemPrompt }, ...messages]
@@ -149,6 +167,7 @@ export async function chat(
     fullMessages,
     model,
     useTools ? toolSpecs : undefined,
+    thinkOverride,
   );
 }
 
