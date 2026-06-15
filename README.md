@@ -21,6 +21,12 @@ pnpm exec chroma run --path <your-path>
 pnpm dev
 ``` 
 
+## Helpful documentation
+[seyfert](https://www.seyfert.dev/guide)
+[chromadb](https://docs.trychroma.com/docs/overview/getting-started#typescript)
+[ollama](https://github.com/ollama/ollama-js)
+
+
 ## Ideas (AI generated ones)
 
 ### Better conversation management
