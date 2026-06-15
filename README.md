@@ -30,8 +30,8 @@ pnpm dev
 ## Ideas (AI generated ones)
 
 ### Better conversation management
-- **Summarize on archive** — auto-summarize and close conversations when threads are archived
-- **Edit / delete history** — commands to edit or remove specific messages from context
+- [x] **Summarize on archive** — auto-summarize and close conversations when threads are archived
+- [x] **Edit / delete history** — commands to edit or remove specific messages from context
 - **Conversation branching** — fork a conversation into a new thread from any point
 - **Token budgeting** — dynamically trim context based on model's context window instead of a raw message count
 
